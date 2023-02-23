@@ -1,0 +1,9 @@
+First of all, install CUDA toolkit (v10.1, or 10.2).
+
+1. Install 'pyCUDA' using pip of one oft he stand-alone files (pycuda-2021.1+cuda102-cp37-cp37m-win_amd64, for instance). See:
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycuda
+
+2. Install Visual Studio with .Net framework 3.5 and MSVCv140 - VS2015.
+
+3. Add the path to the 'cl.exe' (C compiler in Windows provided by Visual Studio).
+
