@@ -278,7 +278,7 @@ pi = 3.141592
 k = 2 * pi / lambd
 
 #This variable determines in which quadrant is located the real image in the POWER spectrum. 
-#If this variable is assigned to 0, then no filter is applied.
+#If this variable is assigned to 0, then no filter is applied.						
 quadrant = 2 #quadrant to search for the point fo maxima
 
 #CompensationWave search parameters
