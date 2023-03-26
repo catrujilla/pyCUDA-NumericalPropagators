@@ -13,9 +13,11 @@ def guardado(name_out, matriz):
     resultado=Image.fromarray(matriz)
     resultado.save("Numerical_propagators/magenes/"+str(name_out))
 
-def mostrar(matriz, titulo):
+def mostrar(matriz, titulo,ejex,ejey):
     plt.imshow(matriz, cmap = 'gray')
     plt.title(str(titulo))
+    plt.xlabel(str(ejex))
+    plt.ylabel(str(ejey))
     plt.show()
 
 def amplitud (matriz):
