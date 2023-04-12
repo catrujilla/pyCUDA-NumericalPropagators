@@ -1,6 +1,4 @@
 import numpy as np
-import numpy as np
-import math as mt
 from numpy import asarray
 import pycuda.driver as cuda
 import pycuda.autoinit
@@ -14,13 +12,14 @@ from timeit import default_timer as timer
 archivo = "horse.bmp"
 replica = lectura(archivo)
 U = asarray(replica)
+print(U.shape)
 width, height = replica.size
 
 # Se enseña la imagen de origen
 mostrar(U, "original", "pixeles en el eje x", "pixeles en el eje y")
 
 # Esta linea es para iniciar un timer que cuente cuanto demora en compilar el programa
-start = timer()
+
 
 # M es el número de píxeles en el eje y de la imagen origen
 M = height
@@ -117,6 +116,7 @@ __global__ void fft_shift_img(float *final,float *U_gpu, int N, int M)
 __global__ void Fresnel2(cuComplex *final,cuComplex *dest_copia, cuComplex *dest_gpu, float *m_gpu, float *n_gpu,  float dx_, float dy_, float lamb, float z, float pi, int N, int M,float dx, float dy)
 {
 
+
     int fila = blockIdx.x*blockDim.x+threadIdx.x;
 	int col = blockIdx.y*blockDim.y+threadIdx.y;
     int i2= ((fila*N)+col);
@@ -142,6 +142,7 @@ dest_gpu = gpuarray.empty((N, M), np.complex64)
 x_gpu = gpuarray.empty((N, M), np.float32)
 final = gpuarray.empty((N, M), np.complex64)
 
+start = timer()
 # Con el grid_dim se puede ajustar la malla que se va a considerar
 block_dim = (16, 16, 1)
 
@@ -153,14 +154,14 @@ Fresnel(U_gpu, dest_copia, dest_gpu, m_gpu, n_gpu, np.float32(dx), np.float32(dy
     lamb), np.float32(z), np.float32(pi), np.int32(N), np.int32(M), block=(16, 16, 1), grid=grid_dim)
 
 # Se llama mai como una variable de transporte de datos de la GPU a la CPU
-mai = dest_gpu.get()
+# mai = dest_gpu.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((M, N))
+# finale = mai.reshape((M, N))
 
 # Imagen de salida
-mostrar((np.abs(finale)), "Primer corregimiento de fase",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "Primer corregimiento de fase",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 # En esta parte se va a aplicar otra función por lo que se debe definir un grid adecuado para lograrlo
 grid_dim = (M // (2*block_dim[0]), N // (2*block_dim[1]), 1)
@@ -170,14 +171,14 @@ fft_shift(final, dest_gpu, np.int32(N), np.int32(
     M), block=(16, 16, 1), grid=grid_dim)
 
 # La variable mai es un nombre temporal de recuperación
-mai = final.get()
+# mai = final.get()
 
 # Se recrea la matriz de salida de el shift en la cpu
-finale = mai.reshape((M, N))
+# finale = mai.reshape((M, N))
 
 # Imagen de salida
-mostrar(((np.abs(finale))), "fft shift",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar(((np.abs(finale))), "fft shift",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 
 # Transformada de Fourier
@@ -185,28 +186,28 @@ plan = cu_fft.Plan(U.shape, np.complex64, np.complex64)
 cu_fft.fft(final, dest_gpu, plan)
 
 # La variable mai es un nombre temporal de recuperación
-mai = dest_gpu.get()
+# mai = dest_gpu.get()
 
 # Se recrea la matriz en la cpu
-finale = mai.reshape((M, N))
+# finale = mai.reshape((M, N))
 
 # Imagen de salida para Fourier
-mostrar((np.log(np.abs(finale))), "FFT",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.log(np.abs(finale))), "FFT",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 # Se inicia la funcióm de shifteo una vez se hace la transformada de Fourier
 fft_shift(final, dest_gpu, np.int32(N), np.int32(
     M), block=(16, 16, 1), grid=grid_dim)
 
 # La variable mai es un nombre temporal de recuperación
-mai = final.get()
+# mai = final.get()
 
 # Se recrea la matriz en la cpu
-finale = mai.reshape((M, N))
+# finale = mai.reshape((M, N))
 
 # Imagen de salida para la transformada de fourier
-mostrar((np.log(np.abs(finale))), "fft a la Transformada de Fourier",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.log(np.abs(finale))), "fft a la Transformada de Fourier",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 # Se redefine la dimensión del mallado
 grid_dim = (M // (block_dim[0]), N // (block_dim[1]), 1)
@@ -214,7 +215,7 @@ grid_dim = (M // (block_dim[0]), N // (block_dim[1]), 1)
 # Se inicia la función para el último correjimiento de fase
 Fresnel2(final, dest_gpu, dest_copia, m_gpu, n_gpu, np.float32(dx_), np.float32(dy_), np.float32(lamb), np.float32(
     z), np.float32(pi), np.int32(N), np.int32(M), np.float32(dx), np.float32(dy), block=(16, 16, 1), grid=grid_dim)
-
+print("without GPU:", timer()-start)
 # La variable mai es un nombre temporal de recuperación
 mai = final.get()
 

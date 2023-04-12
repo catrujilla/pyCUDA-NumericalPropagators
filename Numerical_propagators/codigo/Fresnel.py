@@ -6,10 +6,11 @@ from numpy import asarray
 from calculo_imagenes import *
 # Temporizador
 from timeit import default_timer as timer
-start = timer()
+
 # importa una imagen y la replica en formato png para poder jugar con ella
 archivo = "horse.bmp"
 replica = lectura(archivo)
+start = timer()
 U = asarray(replica)
 width, height = replica.size
 # cómo se carga una imagen de origen?
@@ -53,14 +54,14 @@ fase1 = np.exp2((1j * mt.pi / (lamb * z)) *
                 (np.power(n * dx, 2) + np.power(m * dy, 2)))
 fase1 = U*fase1
 
-mostrar(np.abs(fase1), "fase1", "pixeles en el eje x", "pixeles en el eje y")
+# mostrar(np.abs(fase1), "fase1", "pixeles en el eje x", "pixeles en el eje y")
 # Calculo de la transformada de Fourier
 
 campo = np.fft.fftshift(fase1)
-mostrar(np.abs(campo), "fft shift 1",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar(np.abs(campo), "fft shift 1",
+# "pixeles en el eje x", "pixeles en el eje y")
 ft = sp.fft.fft2(campo)
-mostrar(np.abs(ft), "fft", "pixeles en el eje x", "pixeles en el eje y")
+# mostrar(np.abs(ft), "fft", "pixeles en el eje x", "pixeles en el eje y")
 ft = np.fft.fftshift(ft)
 
 
@@ -70,7 +71,6 @@ fase3 = np.exp2((1j * mt.pi / (lamb * z)) *
 
 final = dx*dy*fase2*fase3*ft
 
-
+print("without GPU:", timer()-start)
 mostrar(np.log(np.abs(final)), "Imagen final",
         "pixeles en el eje x", "pixeles en el eje y")
-print("without GPU:", timer()-start)
