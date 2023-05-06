@@ -7,3 +7,9 @@ https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycuda
 
 3. Add the path to the 'cl.exe' (C compiler in Windows provided by Visual Studio).
 
+
+If problems with skcuda (sci-kit cuda):
+
+- See instruction to build and install: https://scikit-cuda.readthedocs.io/en/latest/install.html
+Do not forget to download the installation files from github.
+
