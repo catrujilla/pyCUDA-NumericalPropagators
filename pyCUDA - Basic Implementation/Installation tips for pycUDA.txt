@@ -11,5 +11,5 @@ https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycuda
 If problems with skcuda (sci-kit cuda):
 
 - See instruction to build and install: https://scikit-cuda.readthedocs.io/en/latest/install.html
-Do not forget to download the installation files from github.
+Do not forget to download the installation files from github (or see compressed file in this folder).
 
