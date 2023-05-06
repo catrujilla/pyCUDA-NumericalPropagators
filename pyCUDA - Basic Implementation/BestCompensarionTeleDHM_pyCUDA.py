@@ -7,7 +7,8 @@ import pycuda.gpuarray as gpuarray
 
 import skcuda.fft as cu_fft
 
-import imageio
+#import imageio
+import imageio.v2 as imageio
 import struct
 
 import math
