@@ -10,7 +10,7 @@ from calculo_imagenes import *
 from timeit import default_timer as timer
 archivo = "die_1.jpg"
 replica = lectura(archivo)
-start = timer()
+
 U = asarray(replica)
 width, height = replica.size
 # cómo se carga una imagen de origen?
@@ -47,12 +47,12 @@ dy = 7e-6
 # distancia en la que se posiciona la imagen [m]
 lamb = 632e-9
 k = 2*mt.pi/lamb
-z = 30/100
+z = 0.4
 pi = mt.pi
 # diferencial en el caso de la imagen final
 
-dx_ = 4.5e-5
-dy_ = 4.5e-5
+dx_ = 9e-5
+dy_ = 9e-5
 
 # Definición de matrices de relleno.
 
@@ -221,7 +221,9 @@ big_shift2 = gpuarray.empty((2*N, 2*M), np.complex64)
 
 N1 = N/2
 M1 = M/2
-# Con el grid_dim se puede ajustar la malla que se va a considerar¿
+start = timer()
+# start2 = timer()
+# Con el grid_dim se puede ajustar la malla que se va a considerar
 block_dim = (16, 16, 1)
 
 
@@ -233,97 +235,97 @@ Fase1(U_gpu, dest_copia, dest_gpu, m_gpu, n_gpu, np.float32(dx), np.float32(dy),
     lamb), np.float32(z), np.float32(pi), np.int32(N), np.int32(M), block=block_dim, grid=grid_dim)
 
 # Se llama mai como una variable de transporte de datos de la GPU a la CPU
-mai = dest_gpu.get()
+# mai = dest_gpu.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((M, N))
+# finale = mai.reshape((M, N))
 
 # Imagen de salida
-mostrar((np.abs(finale)), "Eso",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "Eso",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 # Segunda fase
 Fase2(final, m_gpu, n_gpu, np.float32(dx), np.float32(dy), np.float32(dx_), np.float32(dy_), np.float32(
     lamb), np.float32(z), np.float32(pi), np.int32(N), np.int32(M), block=block_dim, grid=grid_dim)
-mai = final.get()
+# mai = final.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((M, N))
+# finale = mai.reshape((M, N))
 
 # Imagen de salida
-mostrar((np.abs(finale)), "Fase 2",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "Fase 2",
+#        "pixeles en el eje x", "pixeles en el eje y")
 grid_dim = (M // (block_dim[0]), N // (block_dim[1]), 1)
 padding(dest_gpu, big, np.int32(N), np.int32(M), np.int32(N1),
         np.int32(M1), block=block_dim, grid=grid_dim)
 padding(final, big2, np.int32(N), np.int32(M), np.int32(N1),
         np.int32(M1), block=block_dim, grid=grid_dim)
-mai = big.get()
+# mai = big.get()
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
 
-mostrar((np.abs(finale)), "Prueba de ",
-        "pixeles en el eje x", "pixeles en el eje y")
-mai = big2.get()
+# mostrar((np.abs(finale)), "Prueba de ",
+#        "pixeles en el eje x", "pixeles en el eje y")
+# mai = big2.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
-mostrar(np.log(np.abs(finale)), "Padding de fase2",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar(np.log(np.abs(finale)), "Padding de fase2",
+#       "pixeles en el eje x", "pixeles en el eje y")
 
 fft_shift2(big_shift, big, np.int32(2*N), np.int32(
     2*M), block=block_dim, grid=grid_dim)
 
-mai = big_shift.get()
+# mai = big_shift.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
-mostrar((np.abs(finale)), "fft_shift a la fase2",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "fft_shift a la fase2",
+#        "pixeles en el eje x", "pixeles en el eje y")
 # primera fft (para la fase 1)
 plan = cu_fft.Plan((2*N, 2*M), np.complex64, np.complex64)
 cu_fft.fft(big_shift, big, plan)
-mai = big.get()
+# mai = big.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
-mostrar((np.abs(finale)), "Primer FFT",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "Primer FFT",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 fft_shift2(big_shift, big, np.int32(
     2*N), np.int32(2*M), block=block_dim, grid=grid_dim)
 
-mai = big_shift.get()
+# mai = big_shift.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
 
-mostrar((np.abs(finale)), "shift posterior a fft 2",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "shift posterior a fft 2",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 # Segunda fft (para la fase 2)
 fft_shift2(big_shift2, big2, np.int32(
     2*N), np.int32(2*M), block=block_dim, grid=grid_dim)
 
-mai = big_shift2.get()
+# mai = big_shift2.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
 
-mostrar((np.abs(finale)), "fft shift del segundo FFT",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "fft shift del segundo FFT",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 cu_fft.fft(big_shift2, big2, plan)
 
@@ -333,56 +335,56 @@ mai = big2.get()
 finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
-mostrar((np.abs(finale)), "fft a la fase2",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "fft a la fase2",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 
 fft_shift2(big_shift2, big2, np.int32(
     2*N), np.int32(2*M), block=block_dim, grid=grid_dim)
 
-mai = big_shift2.get()
+# mai = big_shift2.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
 
-mostrar((np.abs(finale)), "shift posterior a fft 2",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "shift posterior a fft 2",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 grid_dim = (2*M // (block_dim[0]), 2*N // (block_dim[1]), 1)
 
 multi(big, big_shift2, big_shift, np.int32(
     M), block=block_dim, grid=grid_dim)
-mai = big_shift.get()
+# mai = big_shift.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
 # Imagen de salida
-mostrar((np.abs(finale)), "fases en el dominio de la frecuencia",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "fases en el dominio de la frecuencia",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 grid_dim = (M // (block_dim[0]), N // (block_dim[1]), 1)
 fft_shift2(big_shift, big, np.int32(
     2*N), np.int32(2*M), block=block_dim, grid=grid_dim)
 
-mai = big_shift.get()
+# mai = big_shift.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
-mostrar((np.abs(finale)), "fft shift previo a ifft",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "fft shift previo a ifft",
+#        "pixeles en el eje x", "pixeles en el eje y")
 cu_fft.ifft(big_shift, big, plan)
 
-mai = big.get()
+# mai = big.get()
 
 # Se dimensiona la variable mai
-finale = mai.reshape((2*M, 2*N))
+# finale = mai.reshape((2*M, 2*N))
 
-mostrar((np.abs(finale)), "ifft",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar((np.abs(finale)), "ifft",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 fft_shift2(big_shift, big, np.int32(
     2*N), np.int32(2*M), block=block_dim, grid=grid_dim)
@@ -404,17 +406,19 @@ grid_dim = (M // (block_dim[0]), N // (block_dim[1]), 1)
 
 # Se dimensiona la variable mai
 
-print("without GPU:", timer()-start)
 # Imagen de salida
-mai = dest_gpu.get()
-finale = mai.reshape((M, N))
-mostrar((np.abs(finale)), "antes de la fase 3",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mai = dest_gpu.get()
+# finale = mai.reshape((M, N))
+# mostrar((np.abs(finale)), "antes de la fase 3",
+#        "pixeles en el eje x", "pixeles en el eje y")
 
 fase3(dest_gpu, dest_copia, final, m_gpu, n_gpu, np.float32(dx_), np.float32(dy_), np.float32(
     lamb), np.float32(z), np.float32(pi), np.int32(N), np.int32(M), np.float32(dx), np.float32(dy), block=block_dim, grid=grid_dim)
 
 mai = final.get()
 finale = mai.reshape((M, N))
-mostrar(np.log(np.abs(finale)), "final",
-        "pixeles en el eje x", "pixeles en el eje y")
+# mostrar(np.log(np.abs(finale)), "final",
+#        "pixeles en el eje x", "pixeles en el eje y")
+print("without GPU:", timer()-start)
+# print("without GPU:", timer()-start2)
+dual_img(U, np.log(np.abs(finale)), "Fresnel Bluestein")

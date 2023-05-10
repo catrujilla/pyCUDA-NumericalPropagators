@@ -41,7 +41,7 @@ fy = 1/(dy*M)
 
 # distancia en la que se posiciona la imagen [m]
 
-z = 70000
+z = 10
 
 # Numéro y longitud de onda
 
@@ -125,6 +125,7 @@ dest_gpu = gpuarray.empty((N, M), np.complex64)
 x_gpu = gpuarray.empty((N, M), np.complex64)
 final = gpuarray.empty((N, M), np.complex64)
 
+start = timer()
 block_dim = (16, 16, 1)
 
 # Mallado para la primera correción de fase
@@ -133,12 +134,12 @@ grid_dim = (N // (block_dim[0]*2), M // (block_dim[1]*2), 1)
 fft_shift_U(x_gpu, U_gpu, np.int32(M), np.int32(N),
             block=block_dim, grid=grid_dim)
 plan = cu_fft.Plan(U.shape, np.complex64, np.complex64)
-mai = x_gpu.get()
+# mai = x_gpu.get()
 
 # Se recrea la matriz de salida de el shift en la cpu
-finale = mai.reshape((N, M))
-mostrar(((np.abs(finale))), "fft_shift U",
-        "pixeles en el eje x", "pixeles en el eje y")
+# finale = mai.reshape((N, M))
+# mostrar(((np.abs(finale))), "fft_shift U",
+#        "pixeles en el eje x", "pixeles en el eje y")
 cu_fft.fft(x_gpu, dest_gpu, plan)
 mai = dest_gpu.get()
 fft_shift(final, dest_gpu, np.int32(M), np.int32(
@@ -162,9 +163,8 @@ fft_shift(final, dest_gpu, np.int32(M), np.int32(
 cu_fft.ifft(dest_gpu, final, plan)
 fft_shift(dest_gpu, final, np.int32(M), np.int32(
     N), block=block_dim, grid=grid_dim)
-
+print("without GPU:", timer()-start)
 mai = dest_gpu.get()
 finale = mai.reshape((N, M))
-mostrar(((np.abs(finale))), "final",
-        "pixeles en el eje x", "pixeles en el eje y")
 dual_img(U, np.abs(finale), "Espectro angular")
+dual_save(U, np.abs(finale), "Espectro angular")

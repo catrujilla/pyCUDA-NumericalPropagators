@@ -56,3 +56,19 @@ def dual_img(image1, image2, title):
 
     # Mostrar el gráfico
     plt.show()
+
+
+def dual_save(image1, image2, title):
+    fig, (ax1, ax2) = plt.subplots(ncols=2)
+
+    # Graficar las imágenes en cada subplot
+    ax1.imshow(image1, cmap='gray')
+    ax2.imshow(image2, cmap='gray')
+
+    # Personalizar los subplots y la figura
+    ax1.set_title('Entrada')
+    ax2.set_title('Salida')
+    fig.suptitle(str(title))
+
+    # Mostrar el gráfico
+    plt.savefig('Numerical_propagators/imagenes/guardado.png', dpi=1000)

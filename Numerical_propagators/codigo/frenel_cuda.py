@@ -17,7 +17,7 @@ width, height = replica.size
 
 # Se enseña la imagen de origen
 mostrar(U, "original", "pixeles en el eje x", "pixeles en el eje y")
-
+start = timer()
 # Esta linea es para iniciar un timer que cuente cuanto demora en compilar el programa
 
 
@@ -44,7 +44,7 @@ dy = 0.005
 
 # distancia en la que se posiciona la imagen [m]
 lamb = 0.000633  # micrometros
-z = -450  # cada 10e3 corresponde a 1mm
+z = -530  # cada 10e3 corresponde a 1mm
 dx_ = (lamb*z)/(N*dx)
 dy_ = (lamb*z)/(M*dy)
 pi = 3.1415
@@ -142,7 +142,7 @@ dest_gpu = gpuarray.empty((N, M), np.complex64)
 x_gpu = gpuarray.empty((N, M), np.float32)
 final = gpuarray.empty((N, M), np.complex64)
 
-start = timer()
+
 # Con el grid_dim se puede ajustar la malla que se va a considerar
 block_dim = (16, 16, 1)
 
@@ -223,5 +223,4 @@ mai = final.get()
 finale = mai.reshape((M, N))
 
 # Imagen de salida al multiplicar por el último correjimiento de fase
-mostrar(np.log(np.abs(finale)), "Imagen final",
-        "pixeles en el eje x", "pixeles en el eje y")
+dual_img(U, np.log(np.abs(finale)), "Fresnel")
