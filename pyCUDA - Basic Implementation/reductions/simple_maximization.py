@@ -5,7 +5,8 @@ from pycuda.compiler import SourceModule
 
 from timeit import default_timer as timer
 
-import imageio
+#import imageio
+import imageio.v2 as imageio
 
 # CUDA kernel for reduction
 mod = SourceModule("""
